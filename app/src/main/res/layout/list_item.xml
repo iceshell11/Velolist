@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:aapt="http://schemas.android.com/aapt" android:orientation="vertical" android:id="@+id/parent_layout" android:padding="15dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="horizontal" android:layout_width="381dp" android:layout_height="wrap_content">
+        <TextView android:textSize="17sp" android:textColor="#000" android:id="@+id/address"
+                  android:layout_width="276dp" android:layout_height="wrap_content" android:layout_marginLeft="30dp"
+                  android:text="hi there"/>
+        <RelativeLayout android:paddingLeft="10dp" android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+            <TextView android:id="@+id/availableBikeText" android:layout_width="match_parent"
+                      android:layout_height="match_parent" android:text="0/1"/>
+        </RelativeLayout>
+    </LinearLayout>
+    <ProgressBar android:id="@+id/availableBikeBar" android:layout_width="match_parent" android:layout_height="wrap_content" android:progress="20" style="?android:attr/progressBarStyleHorizontal"/>
+</LinearLayout>
