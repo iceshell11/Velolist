@@ -10,5 +10,8 @@
                       android:layout_height="match_parent" android:text="0/1"/>
         </RelativeLayout>
     </LinearLayout>
-    <ProgressBar android:id="@+id/availableBikeBar" android:layout_width="match_parent" android:layout_height="wrap_content" android:progress="20" style="?android:attr/progressBarStyleHorizontal"/>
+    <ProgressBar android:id="@+id/availableBikeBar" android:layout_width="match_parent"
+                 android:layout_height="wrap_content" android:progress="20"
+                 style="?android:attr/progressBarStyleHorizontal"
+    />
 </LinearLayout>

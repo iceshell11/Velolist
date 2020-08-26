@@ -2,7 +2,10 @@ package com.dark1103.velolist.repositories;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.MediaScannerConnection;
 import android.os.Build;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.MutableLiveData;
@@ -15,8 +18,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +64,9 @@ public class ParksRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+//        data2 = readData();
+
         if (data2 != null) {
             for (String item : data2.split(";")) {
                 String[] split = item.split("##%");
@@ -70,11 +80,28 @@ public class ParksRepository {
         return map;
     }
 
+//    private String readData() {
+//        String state = Environment.getExternalStorageState();
+//        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+//            return null;
+//        }
+//        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "data.txt");
+//
+//        FileInputStream stream = null;
+//        try {
+//            stream = new FileInputStream(file);
+//            return new BufferedReader(new InputStreamReader(stream)).readLine();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void saveChanges(Context context) {
         String dataStr = this.dataSet.stream().filter(Park::isSelected).map(value -> value.getId().toString() + "##%" + (value.getName() == null ? "" : value.getName())).collect(Collectors.joining(";"));
         try {
-            FileOutputStream stream = context.openFileOutput("data.cvx", 0);
+            FileOutputStream stream = context.openFileOutput("data.cvx", Context.MODE_PRIVATE);
             stream.write(dataStr.getBytes());
             stream.close();
         } catch (Exception e) {
@@ -100,13 +127,13 @@ public class ParksRepository {
                 JSONArray array = response.getJSONArray("Items");
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = array.getJSONObject(i);
-                    Park park = new Park(obj.getInt(str), obj.getString("Address"), obj.getInt("FreePlaces"),  obj.getInt("AvailableOrdinaryBikes"), selectedList.containsKey(obj.getInt(str)), selectedList.getOrDefault(obj.getInt(str), null));
+                    Park park = new Park(obj.getInt(str), obj.getString("Address"), obj.getInt("FreePlaces"),  obj.getInt("AvailableOrdinaryBikes"), obj.getBoolean("IsLocked"), selectedList.containsKey(obj.getInt(str)), selectedList.getOrDefault(obj.getInt(str), null));
                     ParksRepository.this.dataSet.add(park);
                 }
                 ParksRepository.this.data.setValue(ParksRepository.this.dataSet);
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(context, e.getMessage(), 1).show();
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }, error -> Toast.makeText(context, "Loading fail", 1).show());
         queue.add(jsonRequest);

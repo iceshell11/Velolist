@@ -1,6 +1,10 @@
 package com.dark1103.velolist.adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,7 +79,16 @@ public class ListViewAdapter extends ArrayAdapter<Park> {
         sb.append("/");
         sb.append(item.getFreePlaces() + item.getAvailableBikes());
         availableBikes.setText(sb.toString());
-        progressBar.setProgress((item.getAvailableBikes() * 100) / (item.getFreePlaces() + item.getAvailableBikes()));
+
+        if(item.isLocked()) {
+            progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
+            progressBar.setProgress(100);
+        }else{
+
+            progressBar.setProgress((item.getAvailableBikes() * 100) / (item.getFreePlaces() + item.getAvailableBikes()));
+        }
+
+
         Switch sw = (Switch) convertView2.findViewById(R.id.park_switch_button);
         if (sw != null) {
             sw.setChecked(item.isSelected());

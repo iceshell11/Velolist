@@ -5,16 +5,19 @@ public class Park {
     private int AvailableBikes;
     private int FreePlaces;
 
+    private boolean IsLocked;
+
     private Integer Id;
     private boolean Selected;
 
     private String Name;
 
-    public Park(Integer id, String address, int freePlaces, int avaibleBikes, boolean selected, String name) {
+    public Park(Integer id, String address, int freePlaces, int availableBikes, boolean isLocked, boolean selected, String name) {
         this.Address = address;
         this.Id = id;
         this.FreePlaces = freePlaces;
-        this.AvailableBikes = avaibleBikes;
+        this.AvailableBikes = availableBikes;
+        this.IsLocked = isLocked;
         this.Selected = selected;
         this.Name = name;
     }
@@ -66,4 +69,13 @@ public class Park {
     public void setName(String name) {
         Name = name;
     }
+
+    public boolean isLocked() {
+        return IsLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        IsLocked = locked;
+    }
+
 }
