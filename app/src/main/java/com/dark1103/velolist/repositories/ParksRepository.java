@@ -2,12 +2,7 @@ package com.dark1103.velolist.repositories;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.media.MediaScannerConnection;
-import android.os.Build;
-import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
-import androidx.annotation.RequiresApi;
 import androidx.lifecycle.MutableLiveData;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -18,12 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +33,7 @@ public class ParksRepository {
         return instance;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     public MutableLiveData<List<Park>> getParks(Context context) {
         if (this.dataSet == null) {
             this.dataSet = new ArrayList<>();
@@ -97,7 +88,7 @@ public class ParksRepository {
 //        return null;
 //    }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     public void saveChanges(Context context) {
         String dataStr = this.dataSet.stream().filter(Park::isSelected).map(value -> value.getId().toString() + "##%" + (value.getName() == null ? "" : value.getName())).collect(Collectors.joining(";"));
         try {
@@ -110,15 +101,16 @@ public class ParksRepository {
         this.data.setValue(this.dataSet);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     public void update(final Context context) {
         setParks(context);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @SuppressLint("WrongConstant")
     private void setParks(final Context context) {
         final HashMap<Integer, String> selectedList = loadSelectedParks(context);
+
         RequestQueue queue = Volley.newRequestQueue(context);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(0, "https://velobike.ru/ajax/parkings/", null, response -> {
             String str = "Id";
@@ -127,7 +119,7 @@ public class ParksRepository {
                 JSONArray array = response.getJSONArray("Items");
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = array.getJSONObject(i);
-                    Park park = new Park(obj.getInt(str), obj.getString("Address"), obj.getInt("FreePlaces"),  obj.getInt("AvailableOrdinaryBikes"), obj.getBoolean("IsLocked"), selectedList.containsKey(obj.getInt(str)), selectedList.getOrDefault(obj.getInt(str), null));
+                    Park park = new Park(obj.getInt(str), obj.getString("Address"), obj.getInt("FreePlaces"), obj.getInt("AvailableOrdinaryBikes"), obj.getBoolean("IsLocked"), selectedList.containsKey(obj.getInt(str)), selectedList.getOrDefault(obj.getInt(str), null));
                     ParksRepository.this.dataSet.add(park);
                 }
                 ParksRepository.this.data.setValue(ParksRepository.this.dataSet);
@@ -135,8 +127,30 @@ public class ParksRepository {
                 e.printStackTrace();
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-        }, error -> Toast.makeText(context, "Loading fail", 1).show());
+        }, error -> Toast.makeText(context, error.getMessage(), 1).show());
         queue.add(jsonRequest);
         queue.start();
     }
+
+//    private void trustEveryone() {
+//        try {
+//            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
+//                public boolean verify(String hostname, SSLSession session) {
+//                    return true;
+//                }});
+//            SSLContext context = SSLContext.getInstance("TLS");
+//            context.init(null, new X509TrustManager[]{new X509TrustManager(){
+//                public void checkClientTrusted(X509Certificate[] chain,
+//                                               String authType) throws CertificateException {}
+//                public void checkServerTrusted(X509Certificate[] chain,
+//                                               String authType) throws CertificateException {}
+//                public X509Certificate[] getAcceptedIssuers() {
+//                    return new X509Certificate[0];
+//                }}}, new SecureRandom());
+//            HttpsURLConnection.setDefaultSSLSocketFactory(
+//                    context.getSocketFactory());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
