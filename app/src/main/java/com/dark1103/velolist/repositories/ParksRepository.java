@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.Toast;
 import androidx.lifecycle.MutableLiveData;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -19,6 +21,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ParksRepository {
@@ -112,7 +115,9 @@ public class ParksRepository {
         final HashMap<Integer, String> selectedList = loadSelectedParks(context);
 
         RequestQueue queue = Volley.newRequestQueue(context);
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(0, "https://velobike.ru/ajax/parkings/", null, response -> {
+
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, "https://velobike.ru/ajax/parkings/", null, response -> {
             String str = "Id";
             try {
                 ParksRepository.this.dataSet.clear();
@@ -127,10 +132,20 @@ public class ParksRepository {
                 e.printStackTrace();
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-        }, error -> Toast.makeText(context, error.getMessage(), 1).show());
+        }, error -> Toast.makeText(context, error.getMessage(), 1).show()){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Cookie", "csrftoken_v4=nQ7uocLstSPNTUJfXF1FyKStnVnDJ90FGAOmjPkkKx8MGSYACBp46tkyTC8wcxrb; qrator_ssid=1652041330.960.F6NS3nJE0lvmKUD9-icietlp53om4kl0vv5a7254pfilajqvl; qrator_jsid=1652041330.819.Gz7RNn3h0qbJ5d0Y-1jn471h14ni4k07hpk1hjs2rvi7oae2a; qrator_jsr=1652041330.819.Gz7RNn3h0qbJ5d0Y-7kechi2r2rass18ntlifm8irmqjt9pgg-00; language_v4=ru");
+                return headers;
+            }
+        };
+
         queue.add(jsonRequest);
         queue.start();
     }
+
+
 
 //    private void trustEveryone() {
 //        try {
