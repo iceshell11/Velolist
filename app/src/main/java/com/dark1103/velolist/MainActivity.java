@@ -1,15 +1,23 @@
 package com.dark1103.velolist;
 
-import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.dark1103.velolist.adapters.ListViewAdapter;
@@ -29,7 +37,60 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        WebView webView = findViewById(R.id.webView);
+        webView.getSettings().setJavaScriptEnabled(true);
 
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                String cookies = CookieManager.getInstance().getCookie(url);
+                if(cookies.contains("qrator_jsid")){
+                    ParksRepository.getInstance().setCookies(cookies);
+
+                    try{
+                        loadList();
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT);
+                    } finally {
+                        ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @SuppressWarnings("deprecation") @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+
+            }
+
+            @TargetApi(Build.VERSION_CODES.N) @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
+
+        webView.loadUrl("https://velobike.ru/");
+
+//        if ((checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)&& Build.VERSION.SDK_INT >= 23 ) {
+//
+//        }else{
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 142);
+//        }
+    }
+
+    private void loadList() {
         listView = findViewById(R.id.listView);
         MutableLiveData<List<Park>> list = ParksRepository.getInstance().getParks(this);
 
@@ -58,12 +119,6 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtras(bundle);
             startActivity(intent, bundle);
         });
-
-//        if ((checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)&& Build.VERSION.SDK_INT >= 23 ) {
-//
-//        }else{
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 142);
-//        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

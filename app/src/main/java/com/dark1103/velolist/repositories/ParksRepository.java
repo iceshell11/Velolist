@@ -28,6 +28,7 @@ public class ParksRepository {
     private static ParksRepository instance;
     public MutableLiveData<List<Park>> data = new MutableLiveData<>();
     public ArrayList<Park> dataSet = null;
+    private String cookies = "";
 
     public static ParksRepository getInstance() {
         if (instance == null) {
@@ -134,9 +135,9 @@ public class ParksRepository {
             }
         }, error -> Toast.makeText(context, error.getMessage(), 1).show()){
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Cookie", "csrftoken_v4=nQ7uocLstSPNTUJfXF1FyKStnVnDJ90FGAOmjPkkKx8MGSYACBp46tkyTC8wcxrb; qrator_ssid=1652041330.960.F6NS3nJE0lvmKUD9-icietlp53om4kl0vv5a7254pfilajqvl; qrator_jsid=1652041330.819.Gz7RNn3h0qbJ5d0Y-1jn471h14ni4k07hpk1hjs2rvi7oae2a; qrator_jsr=1652041330.819.Gz7RNn3h0qbJ5d0Y-7kechi2r2rass18ntlifm8irmqjt9pgg-00; language_v4=ru");
+                headers.put("Cookie", cookies);
                 return headers;
             }
         };
@@ -145,6 +146,9 @@ public class ParksRepository {
         queue.start();
     }
 
+    public void setCookies(String cookies) {
+        this.cookies = cookies;
+    }
 
 
 //    private void trustEveryone() {
