@@ -3,17 +3,11 @@ package com.dark1103.velolist.adapters;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Filter;
-import android.widget.ProgressBar;
-import android.widget.Switch;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -95,7 +89,7 @@ public class ListViewAdapter extends ArrayAdapter<Park> {
             sw.setOnCheckedChangeListener((buttonView, isChecked) -> item.setSelected(isChecked));
         }
 
-        convertView2.setContentDescription(item.getId().toString());
+        convertView2.setContentDescription(item.getId());
         return convertView2;
     }
 

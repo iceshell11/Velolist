@@ -10,6 +10,8 @@ import com.dark1103.velolist.models.Park;
 import com.dark1103.velolist.repositories.ParksRepository;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.Objects;
+
 public class ActivityParkSettings extends AppCompatActivity {
     private Park park;
 
@@ -24,8 +26,11 @@ public class ActivityParkSettings extends AppCompatActivity {
         appBar.setHomeButtonEnabled(true);
         appBar.setDisplayHomeAsUpEnabled(true);
 
-        int id = getIntent().getExtras().getInt("Id");
-        park = ParksRepository.getInstance().getParks(this).getValue().stream().filter(x -> x.getId() == id).findAny().get();
+        String id = getIntent().getExtras().getString("Id");
+        park = ParksRepository.getInstance().getParks(this).getValue().stream()
+            .filter(x -> Objects.equals(x.getId(), id))
+            .findAny()
+            .orElseThrow(() -> new RuntimeException("Missing id " + id));
 
         inputbox = findViewById(R.id.inputbox);
 

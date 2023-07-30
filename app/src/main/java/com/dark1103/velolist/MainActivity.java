@@ -1,19 +1,13 @@
 package com.dark1103.velolist;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.*;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -111,9 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
             Bundle bundle = new Bundle();
-            CharSequence description = view.getContentDescription();
-            Integer id = Integer.valueOf(description.toString());
-            bundle.putInt("Id", id);
+            bundle.putString("Id", view.getContentDescription().toString());
 
             Intent intent = new Intent(this, ActivityParkSettings.class);
             intent.putExtras(bundle);

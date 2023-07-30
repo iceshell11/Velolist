@@ -7,12 +7,13 @@ public class Park {
 
     private boolean IsLocked;
 
-    private Integer Id;
+    private String Id;
     private boolean Selected;
 
     private String Name;
 
-    public Park(Integer id, String address, int freePlaces, int availableBikes, boolean isLocked, boolean selected, String name) {
+    public Park(String id, String address, int freePlaces, int availableBikes, boolean isLocked, boolean selected,
+                String name) {
         this.Address = address;
         this.Id = id;
         this.FreePlaces = freePlaces;
@@ -22,11 +23,11 @@ public class Park {
         this.Name = name;
     }
 
-    public Integer getId() {
+    public String getId() {
         return this.Id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.Id = id;
     }
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.Toast;
 import androidx.lifecycle.MutableLiveData;
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -48,8 +47,8 @@ public class ParksRepository {
     }
 
     @SuppressLint({"WrongConstant", "ShowToast"})
-    public HashMap<Integer, String> loadSelectedParks(Context context) {
-        HashMap<Integer, String> map = new HashMap<>();
+    public HashMap<String, String> loadSelectedParks(Context context) {
+        HashMap<String, String> map = new HashMap<>();
         String data2 = null;
         try {
             FileInputStream stream = context.openFileInput("data.cvx");
@@ -69,7 +68,7 @@ public class ParksRepository {
                 if (split.length > 1 && split[1].length() > 0) {
                     name = split[1];
                 }
-                map.put(Integer.parseInt(split[0]), name);
+                map.put(split[0], name);
             }
         }
         return map;
@@ -94,7 +93,7 @@ public class ParksRepository {
 
 
     public void saveChanges(Context context) {
-        String dataStr = this.dataSet.stream().filter(Park::isSelected).map(value -> value.getId().toString() + "##%" + (value.getName() == null ? "" : value.getName())).collect(Collectors.joining(";"));
+        String dataStr = this.dataSet.stream().filter(Park::isSelected).map(value -> value.getId() + "##%" + (value.getName() == null ? "" : value.getName())).collect(Collectors.joining(";"));
         try {
             FileOutputStream stream = context.openFileOutput("data.cvx", Context.MODE_PRIVATE);
             stream.write(dataStr.getBytes());
@@ -113,19 +112,28 @@ public class ParksRepository {
 
     @SuppressLint("WrongConstant")
     private void setParks(final Context context) {
-        final HashMap<Integer, String> selectedList = loadSelectedParks(context);
+        final HashMap<String, String> selectedList = loadSelectedParks(context);
 
         RequestQueue queue = Volley.newRequestQueue(context);
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, "https://velobike.ru/ajax/parkings/", null, response -> {
-            String str = "Id";
             try {
                 ParksRepository.this.dataSet.clear();
                 JSONArray array = response.getJSONArray("Items");
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = array.getJSONObject(i);
-                    Park park = new Park(obj.getInt(str), obj.getString("Address"), obj.getInt("FreePlaces"), obj.getInt("AvailableOrdinaryBikes"), obj.getBoolean("IsLocked"), selectedList.containsKey(obj.getInt(str)), selectedList.getOrDefault(obj.getInt(str), null));
+                    String id = obj.getString("Id");
+                    Park park = new Park(
+                        id,
+                        obj.getString("Address"),
+                        obj.getInt("FreePlaces"),
+                        obj.getInt(
+                            "AvailableOrdinaryBikes"),
+                        obj.getBoolean("IsLocked"),
+                        selectedList.containsKey(id),
+                        selectedList.getOrDefault(id, null)
+                    );
                     ParksRepository.this.dataSet.add(park);
                 }
                 ParksRepository.this.data.setValue(ParksRepository.this.dataSet);
